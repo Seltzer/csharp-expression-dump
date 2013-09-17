@@ -43,7 +43,9 @@
     <Compile Include="Core\EnumerableExt.cs" />
     <Compile Include="Core\FuncExt.cs" />
     <Compile Include="Core\ObjectExt.cs" />
+    <Compile Include="Core\Reflection.cs" />
     <Compile Include="Core\StringEnumerableExt.cs" />
+    <Compile Include="ExpressionDump.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

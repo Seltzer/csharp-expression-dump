@@ -4,6 +4,7 @@
     public class TestThing
     {
         public const string ConstMember = "value: i am a const";
+        public static readonly string ReadonlyMember = "value: i am a const";
 
         public TestThing TestThingInner { get; set; }
 
