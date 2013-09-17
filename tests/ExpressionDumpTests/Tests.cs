@@ -59,7 +59,7 @@ namespace ExpressionDumpTests
             {
                 Console.WriteLine("i");
 
-                ParseExpression(() => new TestThing().Horatio(new TestThing(), 8));
+                ParseExpression(() => new TestThing(new TestThing(8)).Horatio(new TestThing(), 8));
             }
 
             Assert.True(1 == 1);
@@ -73,38 +73,64 @@ namespace ExpressionDumpTests
         }
 
 
-
-
-        string ToStringSub(Expression expr)
+        /// <summary>
+        /// Efficient and convenient way to switch on an expression based on its type
+        /// </summary>
+        static T SwitchOnExpressionType<T>(Expression expr, Func<MethodCallExpression, T> methodCallLambda = null,
+            Func<ConstantExpression, T> constantExprLambda = null,
+            Func<NewExpression, T> newExpressionLambda = null,
+            Func<Expression, T> defaultLambda = null)
         {
             MethodCallExpression methodCallExpression = null;
             LambdaExpression lambdaExpression = null;
             MemberExpression memberExpression = null;
             ConstantExpression constantExpression = null;
+            NewExpression newExpression = null;
 
+            // Short circuited type checking / assignment - more efficient than executing n is checks and 1 as conversion.
             object blah = (object)(methodCallExpression = expr as MethodCallExpression)
                 ?? (object)(lambdaExpression = expr as LambdaExpression)
                 ?? (object)(memberExpression = expr as MemberExpression)
+                ?? (object)(newExpression = expr as NewExpression)
                 ?? (constantExpression = expr as ConstantExpression);
 
             if (methodCallExpression != null)
-            {
-                Console.WriteLine("methodCallExpression");
-
-                string methodSubject = methodCallExpression.Object.IfNotNull(o => o.ToString()) ?? methodCallExpression.Method.ReflectedType.Name;
-                string methodName = methodCallExpression.Method.Name;
-                string args = methodCallExpression.Arguments.Select(ToStringSub).StringJoin(", ");
-
-                return String.Format("{0}.{1}({2})", methodSubject, methodName, args);
-            }
+                return methodCallLambda(methodCallExpression);
             else if (constantExpression != null)
-            {
-                return constantExpression.ToString();
-            }
+                return constantExprLambda(constantExpression);
+            else if (newExpression != null)
+                return newExpressionLambda(newExpression);
             else
-            {
-                return "UNKNOWN - " + expr.GetType();
-            }
+                return defaultLambda(expr);
+        }
+
+
+
+        string ToStringSub(Expression expr)
+        {
+            return SwitchOnExpressionType<string>(expr,
+                methodCallLambda: methodCallExpression =>
+                {
+                    Console.WriteLine("methodCallExpression");
+
+                    string methodSubject = methodCallExpression.Object.IfNotNull(o => o.ToString()) ?? methodCallExpression.Method.ReflectedType.Name;
+                    string methodName = methodCallExpression.Method.Name;
+                    string args = methodCallExpression.Arguments.Select(ToStringSub).StringJoin(", ");
+
+                    return String.Format("{0}.{1}({2})", methodSubject, methodName, args);
+                },
+                
+                constantExprLambda: constantExpression => constantExpression.ToString(),
+                
+                newExpressionLambda: newExpression =>
+                {
+                    // Doesn't work with object initialisation syntax
+                    return String.Format("new {0}{1}({2})", newExpression.Type, "", newExpression.Arguments.Select(ToStringSub).StringJoin());
+                },
+                
+                defaultLambda: e => "UNKNOWN - " + e.GetType()
+                
+                );
         }
 
 

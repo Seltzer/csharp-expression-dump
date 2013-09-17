@@ -18,6 +18,12 @@
 
         }
 
+
+        public TestThing(int _)
+        {
+            
+        }
+
         public string TestMethod()
         {
             return "value: hello to you too";
