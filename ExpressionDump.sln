@@ -1,7 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionDump", "ExpressionDump\ExpressionDump.csproj", "{B20C38E5-1CA9-4EC4-BDDF-38D315C45AA8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6B967D4E-7206-4CC6-9808-D135C1072187}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionDump", "src\ExpressionDump\ExpressionDump.csproj", "{B20C38E5-1CA9-4EC4-BDDF-38D315C45AA8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0FEC963E-D804-4ED8-AC22-AB30D60EDEC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpressionDumpTests", "tests\ExpressionDumpTests\ExpressionDumpTests.csproj", "{57F203A5-A3FD-4B15-99A3-BB9C590A6EE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,8 +19,16 @@ Global
 		{B20C38E5-1CA9-4EC4-BDDF-38D315C45AA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B20C38E5-1CA9-4EC4-BDDF-38D315C45AA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B20C38E5-1CA9-4EC4-BDDF-38D315C45AA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57F203A5-A3FD-4B15-99A3-BB9C590A6EE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57F203A5-A3FD-4B15-99A3-BB9C590A6EE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57F203A5-A3FD-4B15-99A3-BB9C590A6EE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57F203A5-A3FD-4B15-99A3-BB9C590A6EE9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B20C38E5-1CA9-4EC4-BDDF-38D315C45AA8} = {6B967D4E-7206-4CC6-9808-D135C1072187}
+		{57F203A5-A3FD-4B15-99A3-BB9C590A6EE9} = {0FEC963E-D804-4ED8-AC22-AB30D60EDEC0}
 	EndGlobalSection
 EndGlobal
