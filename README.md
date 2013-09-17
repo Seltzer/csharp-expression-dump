@@ -11,3 +11,6 @@ TODO:
 - Add:
 	- Arithmetic ops
 	- Readonly 
+- Limitations:
+	- Can't handle
+		- Optional parameters

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
 using ExpressionDump.Core;
@@ -83,15 +84,25 @@ namespace ExpressionDump
                 {
                     Log("invocationExpression");
 
-                    return invocationExpression.Expression.IfNotNull(Dump) + invocationExpression.Arguments.IfNotNull(DumpParameters);    
+                    
+                    return Dump(invocationExpression.Expression) + DumpParameters(invocationExpression.Arguments);    
                 },
 
 
                 lambdaExprLambda: lambdaExpression =>
                 {
                     Log("lambdaExpression");
+                   
+                    MethodInfo mi = lambdaExpression.Compile().Method;
+                    IEnumerable<string> parameterTypeNames = mi.GetParameters()
+                        .Skip(1)    // The first parameter is always of type Closure - this is a C# implementation detail and we want to ignore it
+                        .Select(p => p.ParameterType.Name);
+
+                    string lambdaType = lambdaExpression.ReturnType != null 
+                        ? String.Format("Func<{0}>", parameterTypeNames.Append(mi.ReturnType.Name).StringJoin(", "))
+                        : String.Format("Action<{0}>", parameterTypeNames.StringJoin(", "));
                     
-                    return String.Format("{0} => {1}", DumpParameters(lambdaExpression.Parameters), Dump(lambdaExpression.Body));
+                    return String.Format("new {0}({1} => {2})", lambdaType, DumpParameters(lambdaExpression.Parameters), Dump(lambdaExpression.Body));
                 },
 
 
