@@ -26,7 +26,7 @@ namespace ExpressionDump
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            Log("Dump invoked with expression: " + expression.ToString());
+            Log("Dump invoked with expression: " + expression.ToString() + " of type " + expression.GetType());
 
             return SwitchOnExpressionType<string>(expression,
                 methodCallLambda: methodCallExpression =>
@@ -38,15 +38,17 @@ namespace ExpressionDump
                     if (!methodCallExpression.Method.IsExtensionMethod())
                     {
                         methodSubject = methodCallExpression.Object.IfNotNull(o => o.ToString()) ?? methodCallExpression.Method.ReflectedType.Name;
-                        args = DumpParameters(methodCallExpression.Arguments);
+                        args = DumpArgsOrParameters(methodCallExpression.Arguments);
                     }
                     else
                     {
                         methodSubject = Dump(methodCallExpression.Arguments[0]);
-                        args = DumpParameters(methodCallExpression.Arguments.Skip(1));
+                        args = DumpArgsOrParameters(methodCallExpression.Arguments.Skip(1));
                     }
                     
-                    return String.Format("{0}.{1}{2}", methodSubject, methodName, args);
+                    return String.Format("{0}.{1}{2}{3}", methodSubject, methodName, 
+                        DumpTypeArgsOrParameters(methodCallExpression.Method.GetGenericArguments()), 
+                        args);
                 },
 
                 constantExprLambda: constantExpression =>
@@ -85,7 +87,7 @@ namespace ExpressionDump
                     Log("invocationExpression");
 
                     
-                    return Dump(invocationExpression.Expression) + DumpParameters(invocationExpression.Arguments);    
+                    return Dump(invocationExpression.Expression) + DumpArgsOrParameters(invocationExpression.Arguments);    
                 },
 
 
@@ -94,15 +96,15 @@ namespace ExpressionDump
                     Log("lambdaExpression");
                    
                     MethodInfo mi = lambdaExpression.Compile().Method;
-                    IEnumerable<string> parameterTypeNames = mi.GetParameters()
+                    IEnumerable<Type> typeParameters = mi.GetParameters()
                         .Skip(1)    // The first parameter is always of type Closure - this is a C# implementation detail and we want to ignore it
-                        .Select(p => p.ParameterType.Name);
+                        .Select(p => p.ParameterType)
+                        .If(() => lambdaExpression.ReturnType != null, types => types.Append(lambdaExpression.ReturnType));
 
-                    string lambdaType = lambdaExpression.ReturnType != null 
-                        ? String.Format("Func<{0}>", parameterTypeNames.Append(mi.ReturnType.Name).StringJoin(", "))
-                        : String.Format("Action<{0}>", parameterTypeNames.StringJoin(", "));
+                    string lambdaType = lambdaExpression.ReturnType != null ? "Func" : "Action";
                     
-                    return String.Format("new {0}({1} => {2})", lambdaType, DumpParameters(lambdaExpression.Parameters), Dump(lambdaExpression.Body));
+                    return String.Format("new {0}{1}({2} => {3})", lambdaType, DumpTypeArgsOrParameters(typeParameters), 
+                        DumpArgsOrParameters(lambdaExpression.Parameters, false), Dump(lambdaExpression.Body));
                 },
 
 
@@ -111,16 +113,43 @@ namespace ExpressionDump
                     return parameterExpression.Name;
                 },
 
+
+                binaryExprLambda: binaryExpression =>
+                {
+                    // TODO
+                    string op = binaryExpression.NodeType == ExpressionType.Add || binaryExpression.NodeType == ExpressionType.AddChecked
+                        ? "+"
+                        : null;
+                    
+                    return String.Format("{0} {1} {2}", Dump(binaryExpression.Left), op, Dump(binaryExpression.Right));
+                },
+
                 
-                defaultLambda: e => "UNKNOWN - " + e.GetType()
+                defaultLambda: e =>
+                {
+                    Log("Yielding unknown");
+                    return "UNKNOWN - " + e.GetType();
+                }
             );
         }
 
-
-        static string DumpParameters(IEnumerable<Expression> expressions)
+        
+        static string DumpArgsOrParameters(IEnumerable<Expression> expressions, bool requireBracketsForOne = true)
         {
+            if (!requireBracketsForOne && expressions.Count() == 1)
+                return Dump(expressions.First());
+
             return "(" + expressions.Select(Dump).StringJoin(", ") + ")";
         }
+
+
+        static string DumpTypeArgsOrParameters(IEnumerable<Type> types)
+        {
+            return types.Any() ? "<" + types.Select(TypeExt.GetTypeAliasOrSelf).StringJoin(", ") + ">" : "";
+        }
+
+
+
 
         /// <summary>
         /// Efficient and convenient way to switch on an expression based on its type
@@ -132,6 +161,7 @@ namespace ExpressionDump
             Func<LambdaExpression, T> lambdaExprLambda = null,
             Func<InvocationExpression, T> invocationExprLambda = null,
             Func<ParameterExpression, T> parameterExprLambda = null,
+            Func<BinaryExpression, T> binaryExprLambda = null,
             Func<Expression, T> defaultLambda = null)
         {
             MethodCallExpression methodCallExpression = null;
@@ -141,6 +171,7 @@ namespace ExpressionDump
             NewExpression newExpression = null;
             InvocationExpression invocationExpression = null;
             ParameterExpression parameterExpression = null;
+            BinaryExpression binaryExpression = null;
             
 
             // Short circuited type checking / assignment - more efficient than executing n is checks and 1 as conversion.
@@ -151,9 +182,9 @@ namespace ExpressionDump
                 ?? (object)(lambdaExpression = expr as LambdaExpression)
                 ?? (object)(constantExpression = expr as ConstantExpression)
                 ?? (object)(parameterExpression = expr as ParameterExpression)
+                ?? (object)(binaryExpression = expr as BinaryExpression)
                 ?? (invocationExpression = expr as InvocationExpression)
                 ;
-                
 
             if (methodCallExpression != null)
                 return methodCallLambda(methodCallExpression);
@@ -169,6 +200,8 @@ namespace ExpressionDump
                 return invocationExprLambda(invocationExpression);
             else if (parameterExpression != null)
                 return parameterExprLambda(parameterExpression);
+            else if (binaryExpression != null)
+                return binaryExprLambda(binaryExpression);
             else
                 return defaultLambda(expr);
         }

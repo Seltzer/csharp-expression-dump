@@ -1,5 +1,40 @@
-﻿namespace ExpressionDumpTests
+﻿using System;
+using System.Collections.Generic;
+using NUnit.Framework;
+
+namespace ExpressionDumpTests
 {
+
+    public class Experiment2222
+    {
+       
+
+        public int Foo(int k)
+        {
+            return k + 5;
+        }
+
+
+        public int Bar(int k)
+        {
+            return k + 50;
+        }
+
+
+        public static Func<A, C> Compose<A, B, C>(Func<B, C> f, Func<A, B> g)
+        {
+            return x => f(g(x));
+        }
+
+
+        public void TestStuff()
+        {
+            Assert.AreEqual(56, Compose<int, int, int>(Foo, Bar)(1));
+        }
+
+    }
+  
+
 
     public class TestThing
     {
