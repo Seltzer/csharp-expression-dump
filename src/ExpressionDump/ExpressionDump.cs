@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
+using ExpressionDump.CodeFormatters;
 using ExpressionDump.Core;
 
 namespace ExpressionDump
@@ -13,12 +14,28 @@ namespace ExpressionDump
 
     public static class ExpressionDump
     {
+        static bool ShouldLog = true;
+
         static void Log(string msg)
         {
 #if DEBUG
-            Console.WriteLine(msg);
+            if (ShouldLog)
+                Console.WriteLine(msg);
 #endif
         }
+
+
+        public static void KillLogging()
+        {
+            ShouldLog = false;
+        }
+
+
+        public static void EnableLogging()
+        {
+            ShouldLog = true;
+        }
+
 
 
         public static string Dump(Expression expression)
@@ -26,7 +43,14 @@ namespace ExpressionDump
             if (expression == null)
                 throw new ArgumentNullException("expression");
 
-            Log("Dump invoked with expression: " + expression.ToString() + " of type " + expression.GetType());
+            Log("Dump invoked with expression: " + expression + " of type " + expression.GetType());
+
+            var wr = new CodeWriter(new DefaultFormatter());
+
+            wr.Visit(expression);
+
+            return wr.ToString();
+
 
             return SwitchOnExpressionType<string>(expression,
                 methodCallLambda: methodCallExpression =>
@@ -54,12 +78,6 @@ namespace ExpressionDump
                 constantExprLambda: constantExpression =>
                 {
                     Log("constantExpression");
-                    Log(constantExpression.Type.ToString());
-                    Log(constantExpression.Value.ToString());
-                    Log(constantExpression.NodeType.ToString());
-                    Log(constantExpression.ToString());
-
-                    Log(constantExpression.ToString());
 
                     return constantExpression.ToString();
                 },
@@ -86,7 +104,6 @@ namespace ExpressionDump
                 {
                     Log("invocationExpression");
 
-                    
                     return Dump(invocationExpression.Expression) + DumpArgsOrParameters(invocationExpression.Arguments);    
                 },
 

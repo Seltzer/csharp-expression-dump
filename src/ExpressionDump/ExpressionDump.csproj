@@ -40,6 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeFormatters\DefaultFormatter.cs" />
+    <Compile Include="CodeFormatters\ICodeFormatter.cs" />
+    <Compile Include="CodeWriter.cs" />
     <Compile Include="Core\EnumerableExt.cs" />
     <Compile Include="Core\FuncExt.cs" />
     <Compile Include="Core\ObjectExt.cs" />

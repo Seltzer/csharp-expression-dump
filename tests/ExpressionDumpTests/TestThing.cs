@@ -51,7 +51,12 @@ namespace ExpressionDumpTests
         public TestThing(TestThing tt)
         {
             TestThingInner = tt;
+        }
 
+
+        public TestThing(TestThing tt, TestThing _)
+        {
+            TestThingInner = tt;
         }
 
 
