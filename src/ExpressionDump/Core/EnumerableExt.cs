@@ -32,5 +32,24 @@ namespace ExpressionDump.Core
 
             return predicate() ? transformFunc(source) : source;
         }
+
+
+        
+        /// <summary>
+        /// Extension method
+        /// </summary>
+        public static void ForEach<T>(this IEnumerable<T> source, Action<T> allItemsAction = null, Action inBetweenItemsAction = null)
+        {
+            var list = source.ToList();
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (i > 0 && inBetweenItemsAction != null)
+                    inBetweenItemsAction();
+
+                if (allItemsAction != null)
+                    allItemsAction(list[i]);
+            }
+        }
     }
 }

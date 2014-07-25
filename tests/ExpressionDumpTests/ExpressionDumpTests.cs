@@ -42,7 +42,7 @@ namespace ExpressionDumpTests
         [Test]
         public void GenericInstanceMethodTests()
         {
-            Assert.AreEqual("new TestThing().Horatio<int>()", InvokeDump( () => new TestThing().Horatio<int>() ));
+            Assert.AreEqual("new ExpressionDumpTests.TestThing().Horatio<int>()", InvokeDump( () => new TestThing().Horatio<int>() ));
         }
 
 
@@ -73,25 +73,50 @@ namespace ExpressionDumpTests
 
 
         [Test]
-        public void TestComplexStuff()
+        public void RegularStaticMethodInvocation()
         {
-            ExpressionDump.ExpressionDump.KillLogging();
-            Assert.AreEqual("new TestThing(new TestThing()).TestMethod()", InvokeDump( () => new TestThing(new TestThing()).TestMethod() ));
-            Assert.AreEqual("TestThing.Test2()", InvokeDump( () => TestThing.Test2() ));
-            Assert.AreEqual("new TestThing(new TestThing()).Horatio<int>()", InvokeDump( () => new TestThing(new TestThing()).Horatio<int>() ));
-            Assert.AreEqual("new TestThing(new TestThing()).Horatio<int>(2, 7)", InvokeDump( () => new TestThing(new TestThing()).Horatio<int>(2, 7) ));
-
-            {
-                Func<int, int, string> func = (a, b) => new TestThing().Horatio(a, b);
-                // Ideally should be able to omit type parameters if unnecessary
-                Assert.AreEqual("func.Curry<int, int, string>()(5)", InvokeDump( () => func.Curry()(5) ));
-            }
-
-            ExpressionDump.ExpressionDump.EnableLogging();
-            
-            //Assert.AreEqual("new TestThing(new TestThing(8)).Horatio<TestThing>(new ExpressionDumpTests.TestThing(), 8)", 
-            //    InvokeDump( () => new TestThing(new TestThing(8)).Horatio(new a.b.c.d.ExpTestThing(), 8) ));
+            Assert.AreEqual("ExpressionDumpTests.TestThing.Test2()", InvokeDump( () => TestThing.Test2() ));
         }
+
+
+        [Test]
+        public void ExtensionMethodInvocation()
+        {
+            var tt = new TestThing();
+
+            Assert.AreEqual("tt.ExtensionMethod()", InvokeDump( () => tt.ExtensionMethod()));
+        }
+
+
+        [Test]
+        public void InstanceMethodInvocation()
+        {
+            var tt = new TestThing();
+
+            Assert.AreEqual("tt.TestMethod()", InvokeDump( () => tt.TestMethod() ));
+        }
+
+
+        //[Test]
+        //public void TestComplexStuff()
+        //{
+        //    Assert.AreEqual(
+        //        "new ExpressionDumpTests.TestThing(new ExpressionDumpTests.TestThing()).TestMethod()", 
+        //        InvokeDump( () => new TestThing(new TestThing()).TestMethod() ));
+        //    Assert.AreEqual("ExpressionDumpTests.TestThing.Test2()", InvokeDump( () => TestThing.Test2() ));
+        //    Assert.AreEqual(
+        //        "new ExpressionDumpTests.TestThing(new ExpressionDumpTests.TestThing()).Horatio<int>()", 
+        //        InvokeDump( () => new TestThing(new TestThing()).Horatio<int>() ));
+        //    Assert.AreEqual(
+        //        "new ExpressionDumpTests.TestThing(new ExpressionDumpTests.TestThing()).Horatio<int>(2, 7)", 
+        //        InvokeDump( () => new TestThing(new TestThing()).Horatio<int>(2, 7) ));
+
+        //    {
+        //        Func<int, int, string> func = (a, b) => new TestThing().Horatio(a, b);
+        //        // Ideally should be able to omit type parameters if unnecessary
+        //        Assert.AreEqual("func.Curry<int, int, string>()(5)", InvokeDump( () => func.Curry()(5) ));
+        //    }
+        //}
     }
     
 }

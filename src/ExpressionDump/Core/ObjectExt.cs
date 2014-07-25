@@ -17,6 +17,18 @@ namespace ExpressionDump.Core
 
             return @this != null ? func(@this) : null;
         }
+
+
+        /// <summary>
+        /// Extension method
+        /// <para>
+        /// Takes @this and pipes it into func as an argument. Like a non-variadic apply with @this as the argument.
+        /// </para>
+        /// </summary>
+        internal static TReturn Pipe<T, TReturn>(this T @this, Func<T, TReturn> func)
+        {
+            return func(@this);
+        }
     }
 
 }

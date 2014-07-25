@@ -88,4 +88,13 @@ namespace ExpressionDumpTests
         }
     }
 
+
+    public static class TestThingExtensions
+    {
+        public static int ExtensionMethod(this TestThing @this)
+        {
+            return 42;
+        }
+    }
+
 }

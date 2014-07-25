@@ -8,6 +8,8 @@ namespace ExpressionDump.CodeFormatters
         string TypeToString(Type type);
 
         string CommaSeparatorToString();
+
+        string OperatorToString(string operatorStr);
     }
 
 }

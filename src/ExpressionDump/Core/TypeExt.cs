@@ -16,7 +16,7 @@ namespace ExpressionDump.Core
 
         public static string GetTypeAliasOrSelf(this Type @this)
         {
-            return aliasDictionary.ContainsKey(@this) ? aliasDictionary[@this] : @this.Name;
+            return aliasDictionary.ContainsKey(@this) ? aliasDictionary[@this] : @this.ToString();
         }
     }
 
