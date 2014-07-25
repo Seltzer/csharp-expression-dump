@@ -40,9 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CodeFormatters\CSharpStyles\CSharpStyle.cs" />
-    <Compile Include="CodeFormatters\DefaultFormatter.cs" />
-    <Compile Include="CodeFormatters\ICodeFormatter.cs" />
+    <Compile Include="CodeWriterFormatters\DefaultCodeFormatter.cs" />
+    <Compile Include="CodeWriterFormatters\ICodeFormatter.cs" />
+    <Compile Include="CSharpStyles\CSharpStyle.cs" />
+    <Compile Include="CodeWriterConfig\CodeWriterConfig.cs" />
     <Compile Include="CodeWriter.cs" />
     <Compile Include="Core\EnumerableExt.cs" />
     <Compile Include="Core\FuncExt.cs" />

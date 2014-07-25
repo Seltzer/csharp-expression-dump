@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
-using ExpressionDump.CodeFormatters;
+using ExpressionDump.CodeWriterConfig;
 
 namespace ExpressionDump
 {
@@ -17,7 +17,7 @@ namespace ExpressionDump
             //Console.WriteLine("LOL");
             //Console.WriteLine(expression.ToString());
 
-            var wr = new CodeWriter(new DefaultFormatter());
+            var wr = new CodeWriter();
 
             wr.Visit(expression);
 

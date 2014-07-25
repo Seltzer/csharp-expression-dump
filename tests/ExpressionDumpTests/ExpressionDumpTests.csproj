@@ -47,8 +47,8 @@
     <Compile Include="ExpressionDumpTests.cs" />
     <Compile Include="Experimentation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TypedTestThing.cs" />
-    <Compile Include="TestThing.cs" />
+    <Compile Include="TestObjects\TypedTestThing.cs" />
+    <Compile Include="TestObjects\TestThing.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\ExpressionDump\ExpressionDump.csproj">

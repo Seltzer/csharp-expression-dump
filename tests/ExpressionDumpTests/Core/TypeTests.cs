@@ -1,4 +1,5 @@
 ﻿using System;
+using ExpressionDumpTests.TestObjects;
 using NUnit.Framework;
 using ExpressionDump.Core;
 

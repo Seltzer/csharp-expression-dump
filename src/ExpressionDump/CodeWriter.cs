@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using ExpressionDump.CodeFormatters;
+using ExpressionDump.CodeWriterConfig;
 using ExpressionDump.Core;
 
 namespace ExpressionDump
@@ -12,13 +12,13 @@ namespace ExpressionDump
     
     class CodeWriter : ExpressionVisitor
     {
-        readonly ICodeFormatter formatter;
+        readonly CodeWriterConfig.CodeWriterConfig config;
         readonly StringBuilder sb = new StringBuilder();
         
 
-        internal CodeWriter(ICodeFormatter formatter)
+        internal CodeWriter(CodeWriterConfig.CodeWriterConfig config = null)
         {
-            this.formatter = formatter;
+            this.config = config ?? new CodeWriterConfig.CodeWriterConfig();
         }
 
 
@@ -113,7 +113,7 @@ namespace ExpressionDump
         protected override Expression VisitBinary(BinaryExpression node)
         {
             Visit(node.Left);
-            sb.Append(formatter.OperatorToString(GetBinaryOperator(node.NodeType)));
+            sb.Append(config.CodeFormatter.OperatorToString(GetBinaryOperator(node.NodeType)));
             Visit(node.Right);
 
             return node;
@@ -162,7 +162,7 @@ namespace ExpressionDump
             }
             else
             {
-                sb.Append(formatter.TypeToString(type));
+                sb.Append(config.CodeFormatter.TypeToString(type));
             }
         }
 
@@ -191,7 +191,7 @@ namespace ExpressionDump
             
             list.ForEach(
                 allItemsAction: writer, 
-                inBetweenItemsAction: () => sb.Append(formatter.CommaSeparatorToString()));
+                inBetweenItemsAction: () => sb.Append(config.CodeFormatter.CommaSeparatorToString()));
 
             sb.Append(closing);
         }

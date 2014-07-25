@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using ExpressionDumpTests.TestObjects;
 using NUnit.Framework;
 
 namespace ExpressionDumpTests

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using ExpressionDumpTests.TestObjects;
 using NUnit.Framework;
 using ExpressionDump.Core;
 
@@ -55,7 +56,7 @@ namespace ExpressionDumpTests
         [Test]
         public void New_Parameterless()
         {
-            Assert.AreEqual("new ExpressionDumpTests.TestThing()", InvokeDump(() => new TestThing()));
+            Assert.AreEqual("new ExpressionDumpTests.TestObjects.TestThing()", InvokeDump(() => new TestThing()));
         }
 
         
@@ -63,10 +64,10 @@ namespace ExpressionDumpTests
         public void New_WithParameters()
         {
             Assert.AreEqual(
-                "new ExpressionDumpTests.TestThing(new ExpressionDumpTests.TestThing())", 
+                "new ExpressionDumpTests.TestObjects.TestThing(new ExpressionDumpTests.TestObjects.TestThing())", 
                 InvokeDump(() => new TestThing(new TestThing())));
             Assert.AreEqual(
-                "new ExpressionDumpTests.TestThing(new ExpressionDumpTests.TestThing(), new ExpressionDumpTests.TestThing())", 
+                "new ExpressionDumpTests.TestObjects.TestThing(new ExpressionDumpTests.TestObjects.TestThing(), new ExpressionDumpTests.TestObjects.TestThing())", 
                 InvokeDump(() => new TestThing(new TestThing(), new TestThing())));
         }
 
@@ -92,7 +93,7 @@ namespace ExpressionDumpTests
         [Test]
         public void MethodInvocation_RegularStaticMethod()
         {
-            Assert.AreEqual("ExpressionDumpTests.TestThing.Test2()", InvokeDump( () => TestThing.Test2() ));
+            Assert.AreEqual("ExpressionDumpTests.TestObjects.TestThing.Test2()", InvokeDump( () => TestThing.Test2() ));
         }
 
 
@@ -121,8 +122,8 @@ namespace ExpressionDumpTests
 
             Assert.AreEqual("tt.Horatio<int>()", InvokeDump( () => tt.Horatio<int>() ));
             
-            Assert.AreEqual("ExpressionDumpTests.TestThing.StaticGenericMethod<int>(3)", InvokeDump( () => TestThing.StaticGenericMethod(3)));
-            Assert.AreEqual("ExpressionDumpTests.TestThing.StaticGenericMethod<int>(3)", InvokeDump( () => TestThing.StaticGenericMethod<int>(3)));
+            Assert.AreEqual("ExpressionDumpTests.TestObjects.TestThing.StaticGenericMethod<int>(3)", InvokeDump( () => TestThing.StaticGenericMethod(3)));
+            Assert.AreEqual("ExpressionDumpTests.TestObjects.TestThing.StaticGenericMethod<int>(3)", InvokeDump( () => TestThing.StaticGenericMethod<int>(3)));
 
             Assert.AreEqual(@"tt.GenericExtensionMethod<int>(7, ""asdf"")", InvokeDump(() => tt.GenericExtensionMethod(7, "asdf")));
             Assert.AreEqual(@"tt.GenericExtensionMethod<int>(7, ""asdf"")", InvokeDump(() => tt.GenericExtensionMethod<int>(7, "asdf")));
@@ -133,14 +134,14 @@ namespace ExpressionDumpTests
         public void TestComplexStuff()
         {
             Assert.AreEqual(
-                "new ExpressionDumpTests.TestThing(new ExpressionDumpTests.TestThing()).TestMethod()", 
+                "new ExpressionDumpTests.TestObjects.TestThing(new ExpressionDumpTests.TestObjects.TestThing()).TestMethod()", 
                 InvokeDump( () => new TestThing(new TestThing()).TestMethod() ));
-            Assert.AreEqual("ExpressionDumpTests.TestThing.Test2()", InvokeDump( () => TestThing.Test2() ));
+            Assert.AreEqual("ExpressionDumpTests.TestObjects.TestThing.Test2()", InvokeDump( () => TestThing.Test2() ));
             Assert.AreEqual(
-                "new ExpressionDumpTests.TestThing(new ExpressionDumpTests.TestThing()).Horatio<int>()", 
+                "new ExpressionDumpTests.TestObjects.TestThing(new ExpressionDumpTests.TestObjects.TestThing()).Horatio<int>()", 
                 InvokeDump( () => new TestThing(new TestThing()).Horatio<int>() ));
             Assert.AreEqual(
-                "new ExpressionDumpTests.TestThing(new ExpressionDumpTests.TestThing()).Horatio<int>(2, 7)", 
+                "new ExpressionDumpTests.TestObjects.TestThing(new ExpressionDumpTests.TestObjects.TestThing()).Horatio<int>(2, 7)", 
                 InvokeDump( () => new TestThing(new TestThing()).Horatio<int>(2, 7) ));
 
             {
