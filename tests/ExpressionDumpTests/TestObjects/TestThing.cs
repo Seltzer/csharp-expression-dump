@@ -42,6 +42,9 @@ namespace ExpressionDumpTests.TestObjects
 
         public TestThing TestThingInner { get; set; }
 
+
+        public int Blah { get; set; }
+
         public TestThing()
         {
 

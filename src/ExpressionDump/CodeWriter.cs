@@ -26,14 +26,7 @@ namespace ExpressionDump
         {
             if (node != null)
                 Console.WriteLine("Visiting expression of type " + node.GetType());
-
-            //if (node is FieldExpression)
-            //{
-            //    sb.Append((node as ParameterExpression).Name);
-
-            //    return node;
-            //}
-
+            
             return base.Visit(node);
         }
         
@@ -48,10 +41,9 @@ namespace ExpressionDump
         {
             sb.Append("new ");
             
-            
             VisitType(node.Constructor.DeclaringType);
             VisitMethodParametersOrArguments(node.Arguments);
-
+            
             return node;
         }
         
@@ -69,8 +61,30 @@ namespace ExpressionDump
             sb.Append(node.Member.Name);
 
             return node;
-            return base.VisitMember(node);
         }
+
+
+        protected override Expression VisitMemberInit(MemberInitExpression node)
+        {
+            Visit(node.NewExpression);
+            // TODO: Preceding space
+            // TODO: Style for braces spaces
+            VisitCommaSeparatedList(node.Bindings, " { ", b => VisitMemberBinding(b), " }");
+
+            return node;
+        }
+
+
+        protected override MemberAssignment VisitMemberAssignment(MemberAssignment node)
+        {
+            sb.Append(node.Member.Name);
+            sb.Append(" =");
+            sb.Append(" ");
+            Visit(node.Expression);
+
+            return node;
+        }
+        
 
         protected override Expression VisitLambda<T>(Expression<T> lambdaExpression)
         {
@@ -195,7 +209,7 @@ namespace ExpressionDump
 
             sb.Append(closing);
         }
-
+        
 
         void Space()
         {

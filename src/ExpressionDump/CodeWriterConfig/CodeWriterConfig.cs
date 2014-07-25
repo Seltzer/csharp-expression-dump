@@ -12,8 +12,8 @@ namespace ExpressionDump.CodeWriterConfig
 
         public CodeWriterConfig(ICodeFormatter codeFormatter = null, CSharpStyle style = null)
         {
-            CodeFormatter = codeFormatter ?? new DefaultCodeFormatter();
             Style = style ?? new CSharpStyle();
+            CodeFormatter = codeFormatter ?? new DefaultCodeFormatter(Style);
         }
     }
 

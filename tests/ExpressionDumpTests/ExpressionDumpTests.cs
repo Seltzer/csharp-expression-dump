@@ -82,6 +82,24 @@ namespace ExpressionDumpTests
 
 
         [Test]
+        public void New_ParameterlessPlusObjectInitialiserTest()
+        {
+            Assert.AreEqual(
+                "new ExpressionDumpTests.TestObjects.TestThing { Blah = 5 }", 
+                InvokeDump(() => new TestThing { Blah = 5 }));
+        }
+
+
+        [Test]
+        public void New_NonParameterlessPlusObjectInitialiserTest()
+        {
+            Assert.AreEqual(
+                "new ExpressionDumpTests.TestObjects.TestThing(7) { Blah = 5 }", 
+                InvokeDump(() => new TestThing(7) { Blah = 5 }));
+        }
+
+
+        [Test]
         public void MethodInvocation_InstanceMethod()
         {
             var tt = new TestThing();
