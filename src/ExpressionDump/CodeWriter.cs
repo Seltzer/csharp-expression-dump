@@ -37,14 +37,10 @@ namespace ExpressionDump
         }
 
 
+        
         protected override Expression VisitNew(NewExpression node)
         {
-            sb.Append("new ");
-            
-            VisitType(node.Constructor.DeclaringType);
-            VisitMethodParametersOrArguments(node.Arguments);
-            
-            return node;
+            return VisitNew(node, null);
         }
         
 
@@ -64,9 +60,32 @@ namespace ExpressionDump
         }
 
 
+        protected override Expression VisitNewArray(NewArrayExpression node)
+        {
+            if (node.NodeType == ExpressionType.NewArrayInit)
+            {
+                sb.Append("new ");
+                VisitType(node.Type);
+                Space();
+
+                VisitBracedList(node.Expressions, expression => Visit(expression));
+            }
+            else if (node.NodeType == ExpressionType.NewArrayBounds)
+            {
+                sb.Append("new ");
+                VisitType(node.Type);
+                Space();
+                VisitBracketedList(node.Expressions, expression => Visit(expression));
+            }
+
+
+            return node;
+        }
+
+
         protected override Expression VisitMemberInit(MemberInitExpression node)
         {
-            Visit(node.NewExpression);
+            VisitNew(node.NewExpression, true);
             // TODO: Preceding space
             // TODO: Style for braces spaces
             VisitCommaSeparatedList(node.Bindings, " { ", b => VisitMemberBinding(b), " }");
@@ -78,8 +97,8 @@ namespace ExpressionDump
         protected override MemberAssignment VisitMemberAssignment(MemberAssignment node)
         {
             sb.Append(node.Member.Name);
-            sb.Append(" =");
-            sb.Append(" ");
+            sb.Append(config.CodeFormatter.OperatorToString("="));
+
             Visit(node.Expression);
 
             return node;
@@ -134,6 +153,40 @@ namespace ExpressionDump
         }
 
 
+        protected override Expression VisitConditional(ConditionalExpression node)
+        {
+            bool isTernary = node.Type != typeof(void) && (node.IfTrue.NodeType != ExpressionType.Block
+                || (node.IfFalse != null && node.IfFalse.NodeType != ExpressionType.Block));
+
+            if (!isTernary)
+            {
+                sb.Append("if (");
+                Visit(node.Test);
+                sb.Append(") { ");
+
+                Visit(node.NodeType == ExpressionType.Block ? node : (Expression)Expression.Block(node.IfTrue));
+            
+                //if (node.IfFalse != null)
+                //{
+                //    sb.Append("else ");
+
+                //    Visit(node.NodeType == ExpressionType.Block ? node : (Expression)Expression.Block(node.IfFalse));
+                //} 
+            }
+            else
+            {
+                sb.Append("(");
+                Visit(node.Test);
+                sb.Append(" ? ");
+                Visit(node.IfTrue);
+                sb.Append(" : ");
+                Visit(node.IfFalse);
+                sb.Append(")");
+            }
+
+            return node;
+        }
+
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             var method = node.Method;
@@ -167,17 +220,10 @@ namespace ExpressionDump
 
         void VisitType(Type type)
         {
-            if (type.IsGenericType)
-            {
-                // FIXME
-                sb.Append(type.Name.UpToButExcludingLast("`"));
+            sb.Append(TypeToString(type));
 
+            if (type.IsGenericType)
                 VisitTypeParameterArguments(type.GetGenericArguments());
-            }
-            else
-            {
-                sb.Append(config.CodeFormatter.TypeToString(type));
-            }
         }
 
         
@@ -199,6 +245,18 @@ namespace ExpressionDump
         }
 
 
+        void VisitBracedList<T>(IEnumerable<T> list, Action<T> writer)
+        {
+            VisitCommaSeparatedList(list, "{ ", writer, " }");
+        }
+
+
+        void VisitBracketedList<T>(IEnumerable<T> list, Action<T> writer)
+        {
+            VisitCommaSeparatedList(list, "[", writer, "]");
+        }
+
+
         void VisitCommaSeparatedList<T>(IEnumerable<T> list, string opening, Action<T> writer, string closing)
         {
             sb.Append(opening);
@@ -210,6 +268,22 @@ namespace ExpressionDump
             sb.Append(closing);
         }
         
+        
+        Expression VisitNew(NewExpression node, bool? isInContextOfMemberInitialiser)
+        {
+            sb.Append("new ");
+            
+            VisitType(node.Constructor.DeclaringType);
+
+            // In an expression like 'new Widget() { Blah = 2 }', we might want to omit the parentheses
+            bool canOmitParentheses = isInContextOfMemberInitialiser.HasValue && isInContextOfMemberInitialiser.Value && node.Arguments.Count == 0;
+
+            if (!canOmitParentheses || !config.Style.StripRedundantEmptyParentheses)
+                VisitMethodParametersOrArguments(node.Arguments);
+
+            return node;
+        }
+
 
         void Space()
         {
@@ -297,6 +371,28 @@ namespace ExpressionDump
         {
             return sb.ToString();
         }
+
+
+        string TypeToString(Type type)
+        {
+            if (type.IsArray)
+                return TypeToString(type.GetElementType()) + "[]";
+                    
+            if (aliasDictionary.ContainsKey(type))
+                return aliasDictionary[type];
+
+            if (type.IsGenericType)
+                return type.Name.UpToButExcludingLast("`");
+    
+            return type.ToString();
+        }
+
+
+        static readonly Dictionary<Type, string> aliasDictionary = new Dictionary<Type, string>()
+        {
+            { typeof(int), "int" },
+            { typeof(string), "string" },
+        };
     }
 
 }

@@ -1,7 +1,11 @@
 ﻿namespace ExpressionDump.CSharpStyles
 {
 
-    // ReSharper disable SimplifyConditionalTernaryExpression
+    
+    /// <summary>
+    /// This class represents purely stylistic rules which CodeWriter should follow when generating C# code
+    /// </summary>
+    /// ReSharper disable SimplifyConditionalTernaryExpression
     public class CSharpStyle
     {
         internal bool InsertSpaceAfterComma
@@ -19,6 +23,17 @@
             set { surroundOperatorsWithSpace = value; }
         }
         bool? surroundOperatorsWithSpace;
+
+
+        /// <summary>
+        /// Determines whether the empty parentheses are stripped in expressions like 'new Widget() { Blah = 2 }'
+        /// </summary>
+        internal bool StripRedundantEmptyParentheses
+        {
+            get { return stripRedundantEmptyParentheses.HasValue ? stripRedundantEmptyParentheses.Value : true; }
+            set { stripRedundantEmptyParentheses = value; }
+        }
+        bool? stripRedundantEmptyParentheses;
     }
     // ReSharper restore SimplifyConditionalTernaryExpression
 

@@ -12,5 +12,9 @@ TODO:
 	- Arithmetic ops
 	- Readonly 
 - Limitations:
-	- Can't handle
+    - Compiler gets in the way at times, by replacing:
+        - Constants with their values
+        - Expressions like 'true ? 2 : 3' with '2'
+	- Can't handle things which expressions can't handle; i.e.
 		- Optional parameters
+        - Multi-dimensional array initialisers

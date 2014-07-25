@@ -46,11 +46,46 @@ namespace ExpressionDumpTests
             Assert.AreEqual("new Func<int, int, int>((a, b) => a)(1, 2)", InvokeDump( () => new Func<int, int, int>((a, b) => a)(1, 2) ));
         }
         
+
         [Test]
-        public void OperatorTests()
+        public void BinaryOperatorTests()
         {
             Assert.AreEqual("new Func<int, int, int>((a, b) => a + b)(1, 2)", InvokeDump( () => new Func<int, int, int>((a, b) => a + b)(1, 2) ));
         }
+
+
+        [Test]
+        public void TernaryOperatorTest()
+        {
+            bool blah = true;
+
+            // FIXME: See if we can remove redundant brackets
+            Assert.AreEqual("(blah ? 2 : 3)", InvokeDump( () => blah ? 2 : 3 ));
+        }
+
+
+        
+        //[Test]
+        //public void If_NoElse()
+        //{
+        //    bool blah = true;
+        //    int i = 2;
+
+        //    //Assert.AreEqual("blah ? 2 : 3", InvokeDump(() => { if (blah) return 3; else return 7; } }));
+        //    Assert.AreEqual("blah ? 2 : 3", InvokeDump<int>(() =>
+        //    {
+        //        if (blah)
+        //        {
+        //            return 3;
+        //        }
+        //        else
+        //        {
+        //            return 7;
+        //        }
+        //    }));
+        //}
+
+
 
 
         [Test]
@@ -98,6 +133,19 @@ namespace ExpressionDumpTests
                 InvokeDump(() => new TestThing(7) { Blah = 5 }));
         }
 
+
+        [Test]
+        public void New_ArrayInitialiserTest()
+        {
+            Assert.AreEqual(
+                "new int[] { 1, 2, 3, 4 }", 
+                InvokeDump(() => new int[] { 1, 2, 3, 4 }));
+
+            Assert.AreEqual(
+                "new int[][] { new int[] { 1, 2 }, new int[] { 3, 4 } }", 
+                InvokeDump(() => new int[][] { new [] { 1, 2 }, new[]  { 3, 4 } }));
+        }
+        
 
         [Test]
         public void MethodInvocation_InstanceMethod()
