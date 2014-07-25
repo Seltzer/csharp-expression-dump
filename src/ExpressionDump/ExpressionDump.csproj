@@ -49,6 +49,7 @@
     <Compile Include="Core\ObjectExt.cs" />
     <Compile Include="Core\Reflection.cs" />
     <Compile Include="Core\StringEnumerableExt.cs" />
+    <Compile Include="Core\StringExt.cs" />
     <Compile Include="Core\TypeExt.cs" />
     <Compile Include="ExpressionDump.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

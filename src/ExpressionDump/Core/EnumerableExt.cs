@@ -10,6 +10,15 @@ namespace ExpressionDump.Core
         /// <summary>
         /// Extension method
         /// </summary>
+        public static T Second<T>(this IEnumerable<T> source)
+        {
+            return source.Skip(1).First();
+        }
+
+
+        /// <summary>
+        /// Extension method
+        /// </summary>
         public static IEnumerable<T> Append<T>(this IEnumerable<T> @this, T elementToAppend)
         {
             foreach (T element in @this)

@@ -48,6 +48,7 @@ namespace ExpressionDump
         {
             sb.Append("new ");
             
+            
             VisitType(node.Constructor.DeclaringType);
             VisitMethodParametersOrArguments(node.Arguments);
 
@@ -126,13 +127,9 @@ namespace ExpressionDump
             if (method.IsStatic)
             {
                 if (!method.IsExtensionMethod())
-                {
                     VisitType(method.DeclaringType);
-                }
                 else
-                {
                     Visit(node.Arguments.First());
-                }
             }
             else
             {
@@ -152,11 +149,21 @@ namespace ExpressionDump
            
             return node;
         }
-
+        
 
         void VisitType(Type type)
         {
-            sb.Append(formatter.TypeToString(type));
+            if (type.IsGenericType)
+            {
+                // FIXME
+                sb.Append(type.Name.UpToButExcludingLast("`"));
+
+                VisitTypeParameterArguments(type.GetGenericArguments());
+            }
+            else
+            {
+                sb.Append(formatter.TypeToString(type));
+            }
         }
 
         
@@ -195,7 +202,7 @@ namespace ExpressionDump
             sb.Append(" ");
         }
 
-
+        
         static string GetBinaryOperator(ExpressionType type)
         {
             switch (type)

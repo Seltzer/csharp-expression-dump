@@ -76,6 +76,19 @@ namespace ExpressionDumpTests
             return "value: Test2";
         }
 
+
+        public static string StaticGenericMethod<T>(T t1)
+        {
+            return "asdfasdf";
+        }
+
+
+        public string Horatio(string str, int i)
+        {
+            return "asdfasdf";
+        }
+
+
         public string Horatio<T>()
         {
             return default(T).ToString();
@@ -94,6 +107,12 @@ namespace ExpressionDumpTests
         public static int ExtensionMethod(this TestThing @this)
         {
             return 42;
+        }
+
+
+        public static int GenericExtensionMethod<T>(this TestThing @this, T t1, string str)
+        {
+            return 33;
         }
     }
 
